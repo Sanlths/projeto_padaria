@@ -92,7 +92,7 @@ function handleOption(item, quantidade = 1) {
     }
     const resumoPedido = cart.map(c => `${c.quantidade}x ${c.item.nome}`).join(', ');
     const total = cart.reduce((sum, c) => sum + c.item.preco * c.quantidade, 0).toFixed(2);
-    const msg = `Pedido enviado: ${resumoPedido}. Total: R$ ${total}. Obrigado, Berta! ❤️`;
+    const msg = `Pedido enviado: ${resumoPedido}. Total: R$ ${total}. Obrigado ❤️`;
     addMessage(msg);
     speak(msg);
     cart.length = 0;
@@ -167,3 +167,4 @@ document.getElementById('reset').addEventListener('click', () => {
   addMessage(msg);
   speak(msg);
 });
+
