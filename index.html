@@ -2,30 +2,42 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pedido Amigável - Padaria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Padaria Pão Dourado</title>
   <link rel="stylesheet" href="estilo.css" />
 </head>
 <body>
   <main class="container">
-    <h1>Olá, Berta! Que bom te ver </h1>
-    
-    <h2>Cardápio do Dia</h2>
+    <header class="app-header">
+      <span class="badge">Padaria artesanal</span>
+      <h1>Bom dia! O que vai sair quentinho hoje?</h1>
+      <p class="subtitulo">Escolha seus pães, bolos, salgados e bebidas favoritos.</p>
+    </header>
+
+    <section class="hero-card">
+      <div>
+        <strong>Combo da manhã</strong>
+        <span>Pão francês + café com leite</span>
+      </div>
+      <span class="hero-preco">R$ 5,00</span>
+    </section>
+
+    <h2 class="section-title">Cardápio do Dia</h2>
+
     <div id="menu" class="menu"></div>
 
-    <div id="resumo" aria-live="polite" class="resumo"></div>
-    
+    <div id="resumo" aria-live="polite" class="resumo">Nenhum item ainda.</div>
+
     <div id="chat" aria-live="polite"></div>
 
-  
-    <button id="start" class="start-btn">Começar</button>
-
-      <button onclick="handleOption('Finalizar pedido')" class="finalizar-btn">Finalizar Pedido</button>
-
-    <button id="reset" class="reiniciar-btn">Reiniciar</button>
+    <div class="acoes">
+      <button id="start" class="start-btn">Começar atendimento</button>
+      <button id="finalizar" class="finalizar-btn">Finalizar pedido</button>
+      <button id="clear" class="limpar-btn">Limpar carrinho</button>
+      <button id="reset" class="reiniciar-btn">Reiniciar</button>
+    </div>
   </main>
 
   <script src="script.js"></script>
 </body>
 </html>
-
