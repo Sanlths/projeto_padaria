@@ -61,7 +61,7 @@ const menu = [
 function addMessage(text, from = "sistema") {
   const p = document.createElement("p");
   p.classList.add(from);
-  p.textContent = `${from === "sistema" ? "🟡" : "✅"} ${text}`;
+  p.textContent = `${from === "sistema" ? "" : ""} ${text}`;
   chat.appendChild(p);
   chat.scrollTop = chat.scrollHeight;
 }
