@@ -11,13 +11,14 @@ import {
   calcularTotais,
 } from './carrinho.js'
 
-const moeda = new Intl.NumberFormat(
-  'pt-BR',
-  {
-    style: 'currency',
-    currency: 'BRL',
-  },
-)
+const moeda =
+  new Intl.NumberFormat(
+    'pt-BR',
+    {
+      style: 'currency',
+      currency: 'BRL',
+    },
+  )
 
 const estado = {
   categoria: 'Todos',
@@ -29,22 +30,34 @@ const estado = {
 
 const elementos = {
   menu:
-    document.getElementById('menu'),
+    document.getElementById(
+      'menu',
+    ),
 
   filtros:
-    document.getElementById('filtros'),
+    document.getElementById(
+      'filtros',
+    ),
 
   destaques:
-    document.getElementById('destaques'),
+    document.getElementById(
+      'destaques',
+    ),
 
   resumo:
-    document.getElementById('resumo'),
+    document.getElementById(
+      'resumo',
+    ),
 
   subtotal:
-    document.getElementById('subtotal'),
+    document.getElementById(
+      'subtotal',
+    ),
 
   total:
-    document.getElementById('total'),
+    document.getElementById(
+      'total',
+    ),
 
   quantidadeCarrinho:
     document.getElementById(
@@ -57,10 +70,14 @@ const elementos = {
     ),
 
   finalizar:
-    document.getElementById('finalizar'),
+    document.getElementById(
+      'finalizar',
+    ),
 
   limpar:
-    document.getElementById('limpar'),
+    document.getElementById(
+      'limpar',
+    ),
 
   abrirCarrinho:
     document.getElementById(
@@ -93,7 +110,9 @@ const elementos = {
     ),
 
   anuncios:
-    document.getElementById('anuncios'),
+    document.getElementById(
+      'anuncios',
+    ),
 
   confirmacao:
     document.getElementById(
@@ -196,14 +215,9 @@ function falar(
       texto,
     )
 
-  mensagem.lang =
-    'pt-BR'
-
-  mensagem.rate =
-    0.92
-
-  mensagem.pitch =
-    1
+  mensagem.lang = 'pt-BR'
+  mensagem.rate = 0.92
+  mensagem.pitch = 1
 
   const vozes =
     window.speechSynthesis
@@ -287,7 +301,8 @@ function alternarVoz() {
     'speechSynthesis'
       in window
   ) {
-    window.speechSynthesis.cancel()
+    window.speechSynthesis
+      .cancel()
   }
 
   anunciar(
@@ -299,24 +314,62 @@ function criarIconeCarrinho() {
   return `
     <svg
       viewBox="0 0 24 24"
+      fill="none"
       aria-hidden="true"
     >
       <path
-        d="
-          M3.5 4.5h2
-          l1.7 9.2
-          a2 2 0 0 0 2 1.6
-          h7.5
-          a2 2 0 0 0 1.9-1.4
-          l1.5-5.4
-          H7.1
+        d="M3.5 4.5H5.5L7.2 13.7A2 2 0 0 0 9.2 15.3H16.7A2 2 0 0 0 18.6 13.9L20.1 8.5H7.1"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
 
-          M9.6 19
-          a1 1 0 1 0 0 .01
+      <circle
+        cx="9.6"
+        cy="19"
+        r="1"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
 
-          M17.2 19
-          a1 1 0 1 0 0 .01
-        "
+      <circle
+        cx="17.2"
+        cy="19"
+        r="1"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
+    </svg>
+  `
+}
+
+function criarIconeCarrinhoVazio() {
+  return `
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M6.5 9H17.5L16.4 18H7.6L6.5 9Z"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linejoin="round"
+      />
+
+      <path
+        d="M9 9C9 6.8 10.2 5.5 12 5.5C13.8 5.5 15 6.8 15 9"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+      />
+
+      <path
+        d="M5 9H19"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
       />
     </svg>
   `
@@ -412,8 +465,7 @@ function renderizarDestaques() {
     return
   }
 
-  elementos.destaques.innerHTML =
-    ''
+  elementos.destaques.innerHTML = ''
 
   produtosDestaque.forEach(
     (id) => {
@@ -443,8 +495,7 @@ function renderizarFiltros() {
     return
   }
 
-  elementos.filtros.innerHTML =
-    ''
+  elementos.filtros.innerHTML = ''
 
   categorias.forEach(
     (categoria) => {
@@ -453,9 +504,7 @@ function renderizarFiltros() {
           'button',
         )
 
-      botao.type =
-        'button'
-
+      botao.type = 'button'
       botao.className =
         'filtro-botao'
 
@@ -509,8 +558,7 @@ function renderizarMenu() {
     return
   }
 
-  elementos.menu.innerHTML =
-    ''
+  elementos.menu.innerHTML = ''
 
   const produtosVisiveis =
     estado.categoria === 'Todos'
@@ -795,14 +843,15 @@ function criarItemCarrinho(
     )
 
   if (botaoRemover) {
-    botaoRemover.addEventListener(
-      'click',
-      () => {
-        removerProduto(
-          item.produto.id,
-        )
-      },
-    )
+    botaoRemover
+      .addEventListener(
+        'click',
+        () => {
+          removerProduto(
+            item.produto.id,
+          )
+        },
+      )
   }
 
   return linha
@@ -819,11 +868,9 @@ function renderizarCarrinho() {
     )
 
   const vazio =
-    totais.quantidadeItens ===
-    0
+    totais.quantidadeItens === 0
 
-  elementos.resumo.innerHTML =
-    ''
+  elementos.resumo.innerHTML = ''
 
   if (vazio) {
     elementos.resumo.innerHTML = `
@@ -832,7 +879,7 @@ function renderizarCarrinho() {
           class="carrinho-vazio-icone"
           aria-hidden="true"
         >
-          🧺
+          ${criarIconeCarrinhoVazio()}
         </span>
 
         <strong>
@@ -950,8 +997,7 @@ function finalizarPedido() {
     )
 
   if (
-    totais.quantidadeItens ===
-    0
+    totais.quantidadeItens === 0
   ) {
     return
   }
