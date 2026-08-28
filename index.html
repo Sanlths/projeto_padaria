@@ -1,43 +1,514 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Padaria Pão Dourado</title>
-  <link rel="stylesheet" href="estilo.css" />
-</head>
-<body>
-  <main class="container">
-    <header class="app-header">
-      <span class="badge">Padaria artesanal</span>
-      <h1>Bom dia! O que vai sair quentinho hoje?</h1>
-      <p class="subtitulo">Escolha seus pães, bolos, salgados e bebidas favoritos.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Padaria Aurora, sistema demonstrativo de pedidos acessível com cardápio digital, carrinho e leitura por voz."
+    />
+    <meta name="theme-color" content="#f7f0e5" />
+    <title>Padaria Aurora | Pedidos online</title>
+    <link rel="icon" type="image/svg+xml" href="img/logo-aurora.svg" />
+    <link rel="stylesheet" href="estilo.css" />
+  </head>
+
+  <body>
+    <a class="pular-conteudo" href="#cardapio">
+      Ir para o cardápio
+    </a>
+
+    <header class="cabecalho">
+      <div class="cabecalho-conteudo">
+        <a
+          class="marca"
+          href="#inicio"
+          aria-label="Padaria Aurora, início"
+        >
+          <img
+            src="img/logo-aurora.svg"
+            alt=""
+            width="46"
+            height="46"
+          />
+
+          <span>
+            <strong>Padaria Aurora</strong>
+            <small>Pães frescos todos os dias</small>
+          </span>
+        </a>
+
+        <nav class="navegacao" aria-label="Navegação principal">
+          <a href="#cardapio">Cardápio</a>
+          <a href="#acessibilidade">Acessibilidade</a>
+
+          <button
+            class="botao-carrinho-topo"
+            id="abrir-carrinho"
+            type="button"
+          >
+            <span
+              class="icone-carrinho-topo"
+              aria-hidden="true"
+            >
+              🛒
+            </span>
+
+            <span class="texto-carrinho-topo">
+              Ver pedido
+            </span>
+
+            <span
+              class="contador-carrinho"
+              id="contador-topo"
+            >
+              0
+            </span>
+          </button>
+        </nav>
+      </div>
     </header>
 
-    <section class="hero-card">
-      <div>
-        <strong>Combo da manhã</strong>
-        <span>Pão francês + café com leite</span>
+    <main id="inicio">
+      <section
+        class="hero"
+        aria-labelledby="titulo-principal"
+      >
+        <div class="hero-conteudo">
+          <div class="hero-texto">
+            <span class="rotulo">
+              Feito hoje • do forno para você
+            </span>
+
+            <h1 id="titulo-principal">
+              Seu café da manhã do jeito que você gosta.
+            </h1>
+
+            <p>
+              Pães, doces, salgados e cafés preparados com cuidado.
+              Escolha seus favoritos, monte o pedido e acompanhe tudo
+              em uma experiência simples e acessível.
+            </p>
+
+            <div class="hero-acoes">
+              <a
+                class="botao botao-principal"
+                href="#cardapio"
+              >
+                Ver cardápio
+              </a>
+
+              <button
+                class="botao botao-secundario botao-ouvir"
+                type="button"
+                data-acao="ouvir-cardapio"
+              >
+                <span aria-hidden="true">🔊</span>
+                Ouvir opções
+              </button>
+            </div>
+
+            <div
+              class="hero-indicadores"
+              aria-label="Diferenciais da Padaria Aurora"
+            >
+              <div>
+                <strong>7</strong>
+                <span>opções no cardápio</span>
+              </div>
+
+              <div>
+                <strong>100%</strong>
+                <span>pedido no navegador</span>
+              </div>
+
+              <div>
+                <strong>A+</strong>
+                <span>recursos de acessibilidade</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-hidden="true">
+            <div class="hero-card hero-card-principal">
+              <img
+                src="img/croissant.svg"
+                alt=""
+              />
+
+              <div>
+                <span>Mais pedido hoje</span>
+                <strong>Croissant</strong>
+                <small>
+                  Folhado, amanteigado e dourado
+                </small>
+              </div>
+            </div>
+
+            <div class="hero-card hero-card-cafe">
+              <img
+                src="img/cafe-leite.svg"
+                alt=""
+              />
+
+              <span>
+                Café passado na hora
+              </span>
+            </div>
+
+            <div class="hero-selo">
+              <span>☀</span>
+
+              <div>
+                <strong>Fornada fresca</strong>
+                <small>
+                  Preparada ao longo do dia
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="secao-destaques"
+        aria-labelledby="titulo-destaques"
+      >
+        <div class="secao-cabecalho centralizada">
+          <span class="rotulo">
+            Favoritos da casa
+          </span>
+
+          <h2 id="titulo-destaques">
+            Mais pedidos hoje
+          </h2>
+
+          <p>
+            Três escolhas que combinam com qualquer momento do dia.
+          </p>
+        </div>
+
+        <div
+          class="destaques-grid"
+          id="destaques"
+        ></div>
+      </section>
+
+      <section
+        class="secao-pedidos"
+        id="cardapio"
+        aria-labelledby="titulo-cardapio"
+      >
+        <div class="secao-cabecalho">
+          <span class="rotulo">
+            Escolha com calma
+          </span>
+
+          <h2 id="titulo-cardapio">
+            Cardápio da Aurora
+          </h2>
+
+          <p>
+            Filtre por categoria e adicione quantos itens quiser
+            ao seu pedido.
+          </p>
+        </div>
+
+        <div
+          class="filtros"
+          id="filtros"
+          aria-label="Categorias do cardápio"
+        ></div>
+
+        <div class="pedido-layout">
+          <div
+            class="menu"
+            id="menu"
+            aria-live="polite"
+          ></div>
+
+          <aside
+            class="carrinho"
+            id="carrinho"
+            aria-labelledby="titulo-carrinho"
+          >
+            <div class="carrinho-cabecalho">
+              <div>
+                <span class="rotulo">Resumo</span>
+
+                <h2 id="titulo-carrinho">
+                  Seu pedido
+                </h2>
+              </div>
+
+              <span
+                class="carrinho-itens"
+                id="quantidade-carrinho"
+              >
+                0 itens
+              </span>
+            </div>
+
+            <div
+              class="carrinho-lista"
+              id="resumo"
+              aria-live="polite"
+            ></div>
+
+            <div class="carrinho-totais">
+              <div>
+                <span>Subtotal</span>
+                <strong id="subtotal">
+                  R$ 0,00
+                </strong>
+              </div>
+
+              <div>
+                <span>Taxa</span>
+                <strong>Sem taxa</strong>
+              </div>
+
+              <div class="linha-total">
+                <span>Total</span>
+                <strong id="total">
+                  R$ 0,00
+                </strong>
+              </div>
+            </div>
+
+            <button
+              class="botao botao-finalizar"
+              id="finalizar"
+              type="button"
+              disabled
+            >
+              Finalizar pedido
+            </button>
+
+            <button
+              class="botao botao-limpar"
+              id="limpar"
+              type="button"
+              disabled
+            >
+              Limpar carrinho
+            </button>
+
+            <p class="aviso-demonstrativo">
+              Projeto demonstrativo. Nenhum pagamento ou dado
+              pessoal é solicitado.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section
+        class="secao-acessibilidade"
+        id="acessibilidade"
+        aria-labelledby="titulo-acessibilidade"
+      >
+        <div class="acessibilidade-conteudo">
+          <div class="acessibilidade-intro">
+            <span class="rotulo">
+              Acessibilidade integrada
+            </span>
+
+            <h2 id="titulo-acessibilidade">
+              Uma experiência simples para mais pessoas.
+            </h2>
+
+            <p>
+              Ajuste a leitura da interface sem sair do fluxo do pedido.
+              Os controles abaixo funcionam diretamente no navegador
+              e podem ser ativados a qualquer momento.
+            </p>
+          </div>
+
+          <div class="acessibilidade-opcoes">
+            <button
+              class="recurso-card"
+              id="alternar-fonte"
+              type="button"
+              aria-pressed="false"
+            >
+              <span
+                class="recurso-icone"
+                aria-hidden="true"
+              >
+                A+
+              </span>
+
+              <span>
+                <strong>Texto maior</strong>
+                <small>
+                  Aumenta o tamanho dos textos principais.
+                </small>
+              </span>
+            </button>
+
+            <button
+              class="recurso-card"
+              id="alternar-contraste"
+              type="button"
+              aria-pressed="false"
+            >
+              <span
+                class="recurso-icone"
+                aria-hidden="true"
+              >
+                ◐
+              </span>
+
+              <span>
+                <strong>Alto contraste</strong>
+                <small>
+                  Reforça contraste, contornos e foco visual.
+                </small>
+              </span>
+            </button>
+
+            <button
+              class="recurso-card botao-ouvir"
+              type="button"
+              data-acao="ouvir-cardapio"
+            >
+              <span
+                class="recurso-icone"
+                aria-hidden="true"
+              >
+                🔊
+              </span>
+
+              <span>
+                <strong>Ouvir cardápio</strong>
+                <small>
+                  Lê nomes e preços dos produtos em voz alta.
+                </small>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <div class="rodape-conteudo">
+        <div class="rodape-marca">
+          <img
+            src="img/logo-aurora.svg"
+            alt=""
+            width="42"
+            height="42"
+          />
+
+          <div>
+            <strong>Padaria Aurora</strong>
+
+            <span>
+              Projeto demonstrativo de sistema de pedidos acessível.
+            </span>
+          </div>
+        </div>
+
+        <div class="rodape-creditos">
+          <strong>
+            Desenvolvido por LTHS Tecnologia
+          </strong>
+
+          <span>
+            © 2026 LTHS Tecnologia. Todos os direitos reservados.
+          </span>
+        </div>
       </div>
-      <span class="hero-preco">R$ 5,00</span>
-    </section>
+    </footer>
 
-    <h2 class="section-title">Cardápio do Dia</h2>
+    <button
+      class="barra-carrinho-mobile"
+      id="barra-carrinho-mobile"
+      type="button"
+      hidden
+    >
+      <span>
+        <strong id="mobile-itens">
+          0 itens
+        </strong>
 
-    <div id="menu" class="menu"></div>
+        <small>
+          Ver pedido
+        </small>
+      </span>
 
-    <div id="resumo" aria-live="polite" class="resumo">Nenhum item ainda.</div>
+      <strong id="mobile-total">
+        R$ 0,00
+      </strong>
+    </button>
 
-    <div id="chat" aria-live="polite"></div>
+    <dialog
+      class="confirmacao"
+      id="confirmacao-pedido"
+      aria-labelledby="titulo-confirmacao"
+    >
+      <div
+        class="confirmacao-icone"
+        aria-hidden="true"
+      >
+        ✓
+      </div>
 
-    <div class="acoes">
-      <button id="start" class="start-btn">Começar atendimento</button>
-      <button id="finalizar" class="finalizar-btn">Finalizar pedido</button>
-      <button id="clear" class="limpar-btn">Limpar carrinho</button>
-      <button id="reset" class="reiniciar-btn">Reiniciar</button>
-    </div>
-  </main>
+      <span class="rotulo">
+        Pedido registrado
+      </span>
 
-  <script src="script.js"></script>
-</body>
+      <h2 id="titulo-confirmacao">
+        Seu pedido foi recebido.
+      </h2>
+
+      <p>
+        Esta é uma confirmação demonstrativa para fins de portfólio.
+      </p>
+
+      <div class="confirmacao-resumo">
+        <div>
+          <span>Número do pedido</span>
+          <strong id="numero-pedido">
+            AUR 0000
+          </strong>
+        </div>
+
+        <div>
+          <span>Itens</span>
+          <strong id="confirmacao-itens">
+            0
+          </strong>
+        </div>
+
+        <div>
+          <span>Total</span>
+          <strong id="confirmacao-total">
+            R$ 0,00
+          </strong>
+        </div>
+      </div>
+
+      <button
+        class="botao botao-principal"
+        id="novo-pedido"
+        type="button"
+      >
+        Fazer novo pedido
+      </button>
+    </dialog>
+
+    <div
+      class="sr-only"
+      id="anuncios"
+      aria-live="assertive"
+      aria-atomic="true"
+    ></div>
+
+    <script
+      type="module"
+      src="script.js"
+    ></script>
+  </body>
 </html>
