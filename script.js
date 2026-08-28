@@ -1,245 +1,897 @@
-const chat = document.getElementById("chat");
-const resumo = document.getElementById("resumo");
-const menuContainer = document.getElementById("menu");
-const startBtn = document.getElementById("start");
-const finalizarBtn = document.getElementById("finalizar");
-const clearBtn = document.getElementById("clear");
-const resetBtn = document.getElementById("reset");
+import {
+  categorias,
+  produtos,
+  produtosDestaque,
+} from './dados.js'
 
-const cart = [];
+import {
+  adicionarAoCarrinho,
+  alterarQuantidade,
+  removerDoCarrinho,
+  calcularTotais,
+} from './carrinho.js'
 
-const formatarPreco = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL"
-});
+const moeda =
+  new Intl.NumberFormat(
+    'pt-BR',
+    {
+      style: 'currency',
+      currency: 'BRL',
+    },
+  )
 
-const menu = [
-  {
-    nome: "Pão Francês",
-    preco: 2.00,
-    descricao: "Crocante por fora e macio por dentro.",
-    imagem: "img/paofrances.jpg"
-  },
-  {
-    nome: "Bolo de Cenoura",
-    preco: 7.50,
-    descricao: "Com cobertura cremosa de chocolate.",
-    imagem: "img/bolodecenoura.jpg"
-  },
-  {
-    nome: "Croissant",
-    preco: 6.00,
-    descricao: "Massa folhada amanteigada e dourada.",
-    imagem: "img/croissant.jpg"
-  },
-  {
-    nome: "Sonho com Creme",
-    preco: 5.00,
-    descricao: "Recheado com creme e finalizado com açúcar.",
-    imagem: "img/sonho.jpg"
-  },
-  {
-    nome: "Pão de Queijo",
-    preco: 4.00,
-    descricao: "Quentinho, macio e cheio de queijo.",
-    imagem: "img/pao-queijo.jpg"
-  },
-  {
-    nome: "Torta de Frango",
-    preco: 8.50,
-    descricao: "Massa leve com recheio cremoso de frango.",
-    imagem: "img/torta-frango.jpg"
-  },
-  {
-    nome: "Café com Leite",
-    preco: 3.00,
-    descricao: "Café fresquinho com leite vaporizado.",
-    imagem: "img/cafe-leite.jpg"
+const estado = {
+  categoria: 'Todos',
+  carrinho: [],
+  fonteAmpliada: false,
+  altoContraste: false,
+}
+
+const elementos = {
+  menu:
+    document.getElementById(
+      'menu',
+    ),
+
+  filtros:
+    document.getElementById(
+      'filtros',
+    ),
+
+  destaques:
+    document.getElementById(
+      'destaques',
+    ),
+
+  resumo:
+    document.getElementById(
+      'resumo',
+    ),
+
+  subtotal:
+    document.getElementById(
+      'subtotal',
+    ),
+
+  total:
+    document.getElementById(
+      'total',
+    ),
+
+  quantidadeCarrinho:
+    document.getElementById(
+      'quantidade-carrinho',
+    ),
+
+  contadorTopo:
+    document.getElementById(
+      'contador-topo',
+    ),
+
+  finalizar:
+    document.getElementById(
+      'finalizar',
+    ),
+
+  limpar:
+    document.getElementById(
+      'limpar',
+    ),
+
+  abrirCarrinho:
+    document.getElementById(
+      'abrir-carrinho',
+    ),
+
+  barraMobile:
+    document.getElementById(
+      'barra-carrinho-mobile',
+    ),
+
+  mobileItens:
+    document.getElementById(
+      'mobile-itens',
+    ),
+
+  mobileTotal:
+    document.getElementById(
+      'mobile-total',
+    ),
+
+  alternarFonte:
+    document.getElementById(
+      'alternar-fonte',
+    ),
+
+  alternarContraste:
+    document.getElementById(
+      'alternar-contraste',
+    ),
+
+  anuncios:
+    document.getElementById(
+      'anuncios',
+    ),
+
+  confirmacao:
+    document.getElementById(
+      'confirmacao-pedido',
+    ),
+
+  numeroPedido:
+    document.getElementById(
+      'numero-pedido',
+    ),
+
+  confirmacaoItens:
+    document.getElementById(
+      'confirmacao-itens',
+    ),
+
+  confirmacaoTotal:
+    document.getElementById(
+      'confirmacao-total',
+    ),
+
+  novoPedido:
+    document.getElementById(
+      'novo-pedido',
+    ),
+}
+
+function anunciar(mensagem) {
+  elementos.anuncios.textContent = ''
+
+  window.setTimeout(
+    () => {
+      elementos.anuncios.textContent =
+        mensagem
+    },
+    40,
+  )
+}
+
+function criarIconeCarrinho() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M3.5 4.5h2l1.7 9.2a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 1.9-1.4l1.5-5.4H7.1M9.6 19a1 1 0 1 0 0 .01M17.2 19a1 1 0 1 0 0 .01"
+      />
+    </svg>
+  `
+}
+
+function criarCardProduto(
+  produto,
+  compacto = false,
+) {
+  const artigo =
+    document.createElement(
+      'article',
+    )
+
+  artigo.className =
+    compacto
+      ? 'produto-card produto-card-destaque'
+      : 'produto-card'
+
+  artigo.dataset.categoria =
+    produto.categoria
+
+  artigo.innerHTML = `
+    <div class="produto-imagem-wrap">
+      <img
+        class="produto-imagem"
+        src="${produto.imagem}"
+        alt="${produto.nome}"
+        loading="lazy"
+      />
+
+      <span class="produto-selo">
+        ${produto.destaque}
+      </span>
+    </div>
+
+    <div class="produto-conteudo">
+      <span class="produto-categoria">
+        ${produto.categoria}
+      </span>
+
+      <h3>
+        ${produto.nome}
+      </h3>
+
+      <p>
+        ${produto.descricao}
+      </p>
+
+      <div class="produto-rodape">
+        <strong class="produto-preco">
+          ${moeda.format(produto.preco)}
+        </strong>
+
+        <button
+          class="adicionar-produto"
+          type="button"
+          data-produto="${produto.id}"
+          aria-label="Adicionar ${produto.nome} ao pedido"
+        >
+          ${criarIconeCarrinho()}
+
+          <span>
+            Adicionar
+          </span>
+        </button>
+      </div>
+    </div>
+  `
+
+  artigo
+    .querySelector(
+      '.adicionar-produto',
+    )
+    .addEventListener(
+      'click',
+      () => {
+        adicionarProduto(
+          produto.id,
+        )
+      },
+    )
+
+  return artigo
+}
+
+function renderizarDestaques() {
+  elementos.destaques.innerHTML =
+    ''
+
+  produtosDestaque.forEach(
+    (id) => {
+      const produto =
+        produtos.find(
+          (item) =>
+            item.id === id,
+        )
+
+      if (produto) {
+        elementos.destaques
+          .appendChild(
+            criarCardProduto(
+              produto,
+              true,
+            ),
+          )
+      }
+    },
+  )
+}
+
+function renderizarFiltros() {
+  elementos.filtros.innerHTML =
+    ''
+
+  categorias.forEach(
+    (categoria) => {
+      const botao =
+        document.createElement(
+          'button',
+        )
+
+      botao.type =
+        'button'
+
+      botao.className =
+        'filtro-botao'
+
+      botao.textContent =
+        categoria
+
+      botao.setAttribute(
+        'aria-pressed',
+        String(
+          estado.categoria ===
+            categoria,
+        ),
+      )
+
+      if (
+        estado.categoria ===
+        categoria
+      ) {
+        botao.classList.add(
+          'ativo',
+        )
+      }
+
+      botao.addEventListener(
+        'click',
+        () => {
+          estado.categoria =
+            categoria
+
+          renderizarFiltros()
+          renderizarMenu()
+
+          anunciar(
+            `Categoria ${categoria} selecionada.`,
+          )
+        },
+      )
+
+      elementos.filtros
+        .appendChild(
+          botao,
+        )
+    },
+  )
+}
+
+function renderizarMenu() {
+  elementos.menu.innerHTML = ''
+
+  const visiveis =
+    estado.categoria === 'Todos'
+      ? produtos
+      : produtos.filter(
+          (produto) =>
+            produto.categoria ===
+            estado.categoria,
+        )
+
+  visiveis.forEach(
+    (produto) => {
+      elementos.menu.appendChild(
+        criarCardProduto(produto),
+      )
+    },
+  )
+}
+
+function adicionarProduto(
+  produtoId,
+) {
+  const produto =
+    produtos.find(
+      (item) =>
+        item.id === produtoId,
+    )
+
+  if (!produto) {
+    return
   }
-];
 
-function addMessage(text, from = "sistema") {
-  const p = document.createElement("p");
-  p.classList.add(from);
-  p.textContent = `${from === "sistema" ? "" : ""} ${text}`;
-  chat.appendChild(p);
-  chat.scrollTop = chat.scrollHeight;
+  estado.carrinho =
+    adicionarAoCarrinho(
+      estado.carrinho,
+      produto,
+      1,
+    )
+
+  renderizarCarrinho()
+
+  anunciar(
+    `${produto.nome} adicionado ao pedido.`,
+  )
 }
 
-function speak(text) {
-  if (!("speechSynthesis" in window)) return;
+function atualizarQuantidade(
+  produtoId,
+  delta,
+) {
+  estado.carrinho =
+    alterarQuantidade(
+      estado.carrinho,
+      produtoId,
+      delta,
+    )
 
-  const msg = new SpeechSynthesisUtterance(text);
-  const voices = speechSynthesis.getVoices();
-
-  msg.lang = "pt-BR";
-  msg.rate = 1;
-
-  const voice = voices.find((v) => v.lang === "pt-BR");
-  if (voice) msg.voice = voice;
-
-  speechSynthesis.cancel();
-  speechSynthesis.speak(msg);
+  renderizarCarrinho()
 }
 
-function calcularTotal() {
-  return cart.reduce((sum, c) => sum + c.item.preco * c.quantidade, 0);
+function removerProduto(
+  produtoId,
+) {
+  const item =
+    estado.carrinho.find(
+      (entrada) =>
+        entrada.produto.id ===
+        produtoId,
+    )
+
+  estado.carrinho =
+    removerDoCarrinho(
+      estado.carrinho,
+      produtoId,
+    )
+
+  renderizarCarrinho()
+
+  if (item) {
+    anunciar(
+      `${item.produto.nome} removido do pedido.`,
+    )
+  }
 }
 
-function updateCart() {
-  resumo.innerHTML = "";
-
-  if (cart.length === 0) {
-    resumo.textContent = "Nenhum item ainda.";
-    return;
+function limparCarrinho() {
+  if (
+    estado.carrinho.length === 0
+  ) {
+    return
   }
 
-  cart.forEach((c, index) => {
-    const itemDiv = document.createElement("div");
-    itemDiv.classList.add("resumo-item");
+  estado.carrinho = []
 
-    const textSpan = document.createElement("span");
-    textSpan.textContent = `${c.quantidade}x ${c.item.nome}`;
+  renderizarCarrinho()
 
-    const btnExcluir = document.createElement("button");
-    btnExcluir.textContent = "Excluir";
-    btnExcluir.classList.add("excluir-btn");
+  anunciar(
+    'Carrinho limpo.',
+  )
+}
 
-    btnExcluir.addEventListener("click", () => {
-      cart.splice(index, 1);
-      updateCart();
-    });
+function criarItemCarrinho(
+  item,
+) {
+  const linha =
+    document.createElement(
+      'article',
+    )
 
-    itemDiv.appendChild(textSpan);
-    itemDiv.appendChild(btnExcluir);
-    resumo.appendChild(itemDiv);
-  });
+  linha.className =
+    'carrinho-item'
 
-  const totalDiv = document.createElement("div");
-  totalDiv.classList.add("total");
-  totalDiv.textContent = `Total: ${formatarPreco.format(calcularTotal())}`;
-  resumo.appendChild(totalDiv);
+  linha.innerHTML = `
+    <img
+      src="${item.produto.imagem}"
+      alt=""
+    />
+
+    <div class="carrinho-item-info">
+      <strong>
+        ${item.produto.nome}
+      </strong>
+
+      <span>
+        ${moeda.format(item.produto.preco)} cada
+      </span>
+
+      <button
+        class="remover-item"
+        type="button"
+      >
+        Remover
+      </button>
+    </div>
+
+    <div
+      class="controle-quantidade"
+      aria-label="Quantidade de ${item.produto.nome}"
+    >
+      <button
+        type="button"
+        data-delta="-1"
+        aria-label="Diminuir quantidade de ${item.produto.nome}"
+      >
+        −
+      </button>
+
+      <span aria-live="polite">
+        ${item.quantidade}
+      </span>
+
+      <button
+        type="button"
+        data-delta="1"
+        aria-label="Aumentar quantidade de ${item.produto.nome}"
+      >
+        +
+      </button>
+    </div>
+  `
+
+  linha
+    .querySelectorAll(
+      '[data-delta]',
+    )
+    .forEach(
+      (botao) => {
+        botao.addEventListener(
+          'click',
+          () => {
+            atualizarQuantidade(
+              item.produto.id,
+              Number(
+                botao.dataset.delta,
+              ),
+            )
+          },
+        )
+      },
+    )
+
+  linha
+    .querySelector(
+      '.remover-item',
+    )
+    .addEventListener(
+      'click',
+      () => {
+        removerProduto(
+          item.produto.id,
+        )
+      },
+    )
+
+  return linha
+}
+
+function renderizarCarrinho() {
+  elementos.resumo.innerHTML = ''
+
+  const totais =
+    calcularTotais(
+      estado.carrinho,
+    )
+
+  const vazio =
+    totais.quantidadeItens === 0
+
+  if (vazio) {
+    elementos.resumo.innerHTML = `
+      <div class="carrinho-vazio">
+        <span
+          class="carrinho-vazio-icone"
+          aria-hidden="true"
+        >
+          🧺
+        </span>
+
+        <strong>
+          Seu pedido está vazio
+        </strong>
+
+        <p>
+          Adicione um item do cardápio e ele aparecerá aqui.
+        </p>
+      </div>
+    `
+  } else {
+    estado.carrinho.forEach(
+      (item) => {
+        elementos.resumo
+          .appendChild(
+            criarItemCarrinho(
+              item,
+            ),
+          )
+      },
+    )
+  }
+
+  const legendaItens =
+    `${totais.quantidadeItens} ${
+      totais.quantidadeItens === 1
+        ? 'item'
+        : 'itens'
+    }`
+
+  elementos.quantidadeCarrinho.textContent =
+    legendaItens
+
+  elementos.contadorTopo.textContent =
+    totais.quantidadeItens
+
+  elementos.subtotal.textContent =
+    moeda.format(
+      totais.subtotal,
+    )
+
+  elementos.total.textContent =
+    moeda.format(
+      totais.total,
+    )
+
+  elementos.finalizar.disabled =
+    vazio
+
+  elementos.limpar.disabled =
+    vazio
+
+  elementos.mobileItens.textContent =
+    legendaItens
+
+  elementos.mobileTotal.textContent =
+    moeda.format(
+      totais.total,
+    )
+
+  elementos.barraMobile.hidden =
+    vazio
+}
+
+function gerarNumeroPedido() {
+  if (
+    window.crypto?.getRandomValues
+  ) {
+    const valores =
+      new Uint16Array(1)
+
+    window.crypto
+      .getRandomValues(
+        valores,
+      )
+
+    return `AUR ${String(
+      1000 +
+        (valores[0] % 9000),
+    )}`
+  }
+
+  return `AUR ${Math.floor(
+    1000 +
+      Math.random() * 9000,
+  )}`
 }
 
 function finalizarPedido() {
-  if (cart.length === 0) {
-    const msg = "Você ainda não escolheu nada!";
-    addMessage(msg);
-    speak(msg);
-    return;
+  const totais =
+    calcularTotais(
+      estado.carrinho,
+    )
+
+  if (
+    totais.quantidadeItens === 0
+  ) {
+    return
   }
 
-  const resumoPedido = cart.map((c) => `${c.quantidade}x ${c.item.nome}`).join(", ");
-  const total = formatarPreco.format(calcularTotal());
-  const msg = `Pedido enviado: ${resumoPedido}. Total: ${total}. Obrigado!`;
+  elementos.numeroPedido.textContent =
+    gerarNumeroPedido()
 
-  addMessage(msg);
-  speak(msg);
+  elementos.confirmacaoItens.textContent =
+    totais.quantidadeItens
 
-  cart.length = 0;
-  updateCart();
+  elementos.confirmacaoTotal.textContent =
+    moeda.format(
+      totais.total,
+    )
+
+  estado.carrinho = []
+
+  renderizarCarrinho()
+
+  elementos.confirmacao.showModal()
+
+  anunciar(
+    'Pedido registrado com sucesso.',
+  )
 }
 
-function handleOption(item, quantidade = 1) {
-  addMessage(`${quantidade}x ${item.nome}`, "usuario");
+function rolarParaCarrinho() {
+  document
+    .getElementById(
+      'carrinho',
+    )
+    .scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+}
 
-  const index = cart.findIndex((c) => c.item.nome === item.nome);
+function falar(texto) {
+  if (
+    !(
+      'speechSynthesis'
+      in window
+    )
+  ) {
+    anunciar(
+      'A leitura por voz não está disponível neste navegador.',
+    )
 
-  if (index > -1) {
-    cart[index].quantidade += quantidade;
-  } else {
-    cart.push({ item, quantidade });
+    return
   }
 
-  const msg = `Você escolheu ${quantidade}x ${item.nome}. Deseja mais alguma coisa?`;
-  addMessage(msg);
-  speak(msg);
-  updateCart();
+  window.speechSynthesis.cancel()
+
+  const mensagem =
+    new SpeechSynthesisUtterance(
+      texto,
+    )
+
+  mensagem.lang =
+    'pt-BR'
+
+  mensagem.rate =
+    0.95
+
+  mensagem.pitch =
+    1
+
+  const vozes =
+    window.speechSynthesis
+      .getVoices()
+
+  const vozPt =
+    vozes.find(
+      (voz) =>
+        voz.lang
+          .toLowerCase()
+          .startsWith(
+            'pt-br',
+          ),
+    )
+
+  if (vozPt) {
+    mensagem.voice =
+      vozPt
+  }
+
+  window.speechSynthesis
+    .speak(
+      mensagem,
+    )
 }
 
-function renderMenu() {
-  menuContainer.innerHTML = "";
+function ouvirCardapio() {
+  if (
+    'speechSynthesis'
+      in window &&
+    window.speechSynthesis
+      .speaking
+  ) {
+    window.speechSynthesis
+      .cancel()
 
-  menu.forEach((item) => {
-    const card = document.createElement("article");
-    card.classList.add("item-card");
+    anunciar(
+      'Leitura interrompida.',
+    )
 
-    const imagem = document.createElement("img");
-    imagem.src = item.imagem;
-    imagem.alt = item.nome;
-    imagem.classList.add("item-img");
+    return
+  }
 
-    const conteudo = document.createElement("div");
-    conteudo.classList.add("item-content");
+  const texto =
+    produtos
+      .map(
+        (produto) =>
+          `${produto.nome}, ${moeda.format(produto.preco)}.`,
+      )
+      .join(' ')
 
-    const title = document.createElement("h3");
-    title.textContent = item.nome;
-
-    const descricao = document.createElement("p");
-    descricao.textContent = item.descricao;
-    descricao.classList.add("item-descricao");
-
-    const preco = document.createElement("strong");
-    preco.textContent = formatarPreco.format(item.preco);
-    preco.classList.add("item-preco");
-
-    const controls = document.createElement("div");
-    controls.classList.add("item-controls");
-
-    const input = document.createElement("input");
-    input.type = "number";
-    input.min = "1";
-    input.value = "1";
-    input.setAttribute("aria-label", `Quantidade de ${item.nome}`);
-
-    const btn = document.createElement("button");
-    btn.textContent = "Adicionar";
-
-    btn.addEventListener("click", () => {
-      const qtd = parseInt(input.value, 10);
-      if (qtd > 0) handleOption(item, qtd);
-    });
-
-    controls.appendChild(input);
-    controls.appendChild(btn);
-
-    conteudo.appendChild(title);
-    conteudo.appendChild(descricao);
-    conteudo.appendChild(preco);
-    conteudo.appendChild(controls);
-
-    card.appendChild(imagem);
-    card.appendChild(conteudo);
-
-    menuContainer.appendChild(card);
-  });
+  falar(
+    `Cardápio da Padaria Aurora. ${texto}`,
+  )
 }
 
-startBtn.addEventListener("click", () => {
-  const msg = "Olá! Que bom falar com você. Veja nosso cardápio e escolha o que deseja.";
-  addMessage(msg);
-  speak(msg);
-  updateCart();
-});
+function alternarFonte() {
+  estado.fonteAmpliada =
+    !estado.fonteAmpliada
 
-finalizarBtn.addEventListener("click", finalizarPedido);
+  document.documentElement
+    .classList.toggle(
+      'fonte-ampliada',
+      estado.fonteAmpliada,
+    )
 
-clearBtn.addEventListener("click", () => {
-  cart.length = 0;
-  updateCart();
-  addMessage("Carrinho limpo.", "sistema");
-  speak("Carrinho limpo.");
-});
+  elementos.alternarFonte
+    .classList.toggle(
+      'ativo',
+      estado.fonteAmpliada,
+    )
 
-resetBtn.addEventListener("click", () => {
-  chat.innerHTML = "";
-  cart.length = 0;
-  updateCart();
+  elementos.alternarFonte
+    .setAttribute(
+      'aria-pressed',
+      String(
+        estado.fonteAmpliada,
+      ),
+    )
 
-  const msg = "Chat reiniciado. Como posso ajudar você hoje?";
-  addMessage(msg);
-  speak(msg);
-});
+  anunciar(
+    estado.fonteAmpliada
+      ? 'Texto maior ativado.'
+      : 'Texto maior desativado.',
+  )
+}
 
-renderMenu();
-updateCart();
+function alternarContraste() {
+  estado.altoContraste =
+    !estado.altoContraste
+
+  document.body.classList
+    .toggle(
+      'alto-contraste',
+      estado.altoContraste,
+    )
+
+  elementos.alternarContraste
+    .classList.toggle(
+      'ativo',
+      estado.altoContraste,
+    )
+
+  elementos.alternarContraste
+    .setAttribute(
+      'aria-pressed',
+      String(
+        estado.altoContraste,
+      ),
+    )
+
+  anunciar(
+    estado.altoContraste
+      ? 'Alto contraste ativado.'
+      : 'Alto contraste desativado.',
+  )
+}
+
+elementos.finalizar
+  .addEventListener(
+    'click',
+    finalizarPedido,
+  )
+
+elementos.limpar
+  .addEventListener(
+    'click',
+    limparCarrinho,
+  )
+
+elementos.abrirCarrinho
+  .addEventListener(
+    'click',
+    rolarParaCarrinho,
+  )
+
+elementos.barraMobile
+  .addEventListener(
+    'click',
+    rolarParaCarrinho,
+  )
+
+elementos.alternarFonte
+  .addEventListener(
+    'click',
+    alternarFonte,
+  )
+
+elementos.alternarContraste
+  .addEventListener(
+    'click',
+    alternarContraste,
+  )
+
+elementos.novoPedido
+  .addEventListener(
+    'click',
+    () => {
+      elementos.confirmacao.close()
+
+      document
+        .getElementById(
+          'cardapio',
+        )
+        .scrollIntoView({
+          behavior: 'smooth',
+        })
+    },
+  )
+
+document
+  .querySelectorAll(
+    '[data-acao="ouvir-cardapio"]',
+  )
+  .forEach(
+    (botao) => {
+      botao.addEventListener(
+        'click',
+        ouvirCardapio,
+      )
+    },
+  )
+
+renderizarDestaques()
+renderizarFiltros()
+renderizarMenu()
+renderizarCarrinho()
