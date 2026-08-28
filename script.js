@@ -11,31 +11,50 @@ import {
   calcularTotais,
 } from './carrinho.js'
 
-const moeda = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-})
+const moeda = new Intl.NumberFormat(
+  'pt-BR',
+  {
+    style: 'currency',
+    currency: 'BRL',
+  },
+)
 
 const estado = {
   categoria: 'Todos',
   carrinho: [],
   fonteAmpliada: false,
   altoContraste: false,
+  vozAtiva: false,
 }
 
 const elementos = {
-  menu: document.getElementById('menu'),
-  filtros: document.getElementById('filtros'),
-  destaques: document.getElementById('destaques'),
-  resumo: document.getElementById('resumo'),
-  subtotal: document.getElementById('subtotal'),
-  total: document.getElementById('total'),
+  menu:
+    document.getElementById('menu'),
+
+  filtros:
+    document.getElementById('filtros'),
+
+  destaques:
+    document.getElementById('destaques'),
+
+  resumo:
+    document.getElementById('resumo'),
+
+  subtotal:
+    document.getElementById('subtotal'),
+
+  total:
+    document.getElementById('total'),
 
   quantidadeCarrinho:
-    document.getElementById('quantidade-carrinho'),
+    document.getElementById(
+      'quantidade-carrinho',
+    ),
 
   contadorTopo:
-    document.getElementById('contador-topo'),
+    document.getElementById(
+      'contador-topo',
+    ),
 
   finalizar:
     document.getElementById('finalizar'),
@@ -44,40 +63,62 @@ const elementos = {
     document.getElementById('limpar'),
 
   abrirCarrinho:
-    document.getElementById('abrir-carrinho'),
+    document.getElementById(
+      'abrir-carrinho',
+    ),
 
   barraMobile:
-    document.getElementById('barra-carrinho-mobile'),
+    document.getElementById(
+      'barra-carrinho-mobile',
+    ),
 
   mobileItens:
-    document.getElementById('mobile-itens'),
+    document.getElementById(
+      'mobile-itens',
+    ),
 
   mobileTotal:
-    document.getElementById('mobile-total'),
+    document.getElementById(
+      'mobile-total',
+    ),
 
   alternarFonte:
-    document.getElementById('alternar-fonte'),
+    document.getElementById(
+      'alternar-fonte',
+    ),
 
   alternarContraste:
-    document.getElementById('alternar-contraste'),
+    document.getElementById(
+      'alternar-contraste',
+    ),
 
   anuncios:
     document.getElementById('anuncios'),
 
   confirmacao:
-    document.getElementById('confirmacao-pedido'),
+    document.getElementById(
+      'confirmacao-pedido',
+    ),
 
   numeroPedido:
-    document.getElementById('numero-pedido'),
+    document.getElementById(
+      'numero-pedido',
+    ),
 
   confirmacaoItens:
-    document.getElementById('confirmacao-itens'),
+    document.getElementById(
+      'confirmacao-itens',
+    ),
 
   confirmacaoTotal:
-    document.getElementById('confirmacao-total'),
+    document.getElementById(
+      'confirmacao-total',
+    ),
 
   novoPedido:
-    document.getElementById('novo-pedido'),
+    document.getElementById(
+      'novo-pedido',
+    ),
 }
 
 function anunciar(mensagem) {
@@ -87,9 +128,171 @@ function anunciar(mensagem) {
 
   elementos.anuncios.textContent = ''
 
-  window.setTimeout(() => {
-    elementos.anuncios.textContent = mensagem
-  }, 40)
+  window.setTimeout(
+    () => {
+      elementos.anuncios.textContent =
+        mensagem
+    },
+    40,
+  )
+}
+
+function formatarValorParaVoz(valor) {
+  const reais =
+    Math.floor(valor)
+
+  const centavos =
+    Math.round(
+      (valor - reais) * 100,
+    )
+
+  let texto =
+    `${reais} ${
+      reais === 1
+        ? 'real'
+        : 'reais'
+    }`
+
+  if (centavos > 0) {
+    texto +=
+      ` e ${centavos} ${
+        centavos === 1
+          ? 'centavo'
+          : 'centavos'
+      }`
+  }
+
+  return texto
+}
+
+function falar(
+  texto,
+  forcar = false,
+) {
+  if (
+    !(
+      'speechSynthesis'
+      in window
+    )
+  ) {
+    anunciar(
+      'A leitura por voz não está disponível neste navegador.',
+    )
+
+    return
+  }
+
+  if (
+    !estado.vozAtiva &&
+    !forcar
+  ) {
+    return
+  }
+
+  window.speechSynthesis.cancel()
+
+  const mensagem =
+    new SpeechSynthesisUtterance(
+      texto,
+    )
+
+  mensagem.lang =
+    'pt-BR'
+
+  mensagem.rate =
+    0.92
+
+  mensagem.pitch =
+    1
+
+  const vozes =
+    window.speechSynthesis
+      .getVoices()
+
+  const vozPortugues =
+    vozes.find(
+      (voz) =>
+        voz.lang
+          .toLowerCase()
+          .startsWith(
+            'pt-br',
+          ),
+    )
+
+  if (vozPortugues) {
+    mensagem.voice =
+      vozPortugues
+  }
+
+  window.speechSynthesis
+    .speak(
+      mensagem,
+    )
+}
+
+function atualizarBotoesVoz() {
+  document
+    .querySelectorAll(
+      '[data-acao="alternar-voz"]',
+    )
+    .forEach(
+      (botao) => {
+        botao.setAttribute(
+          'aria-pressed',
+          String(
+            estado.vozAtiva,
+          ),
+        )
+
+        botao.classList.toggle(
+          'ativo',
+          estado.vozAtiva,
+        )
+
+        const texto =
+          botao.querySelector(
+            '.texto-voz',
+          )
+
+        if (texto) {
+          texto.textContent =
+            estado.vozAtiva
+              ? 'Desativar leitura por voz'
+              : 'Ativar leitura por voz'
+        }
+      },
+    )
+}
+
+function alternarVoz() {
+  estado.vozAtiva =
+    !estado.vozAtiva
+
+  atualizarBotoesVoz()
+
+  if (estado.vozAtiva) {
+    falar(
+      'Leitura por voz ativada. As alterações do seu pedido serão informadas automaticamente.',
+      true,
+    )
+
+    anunciar(
+      'Leitura por voz ativada.',
+    )
+
+    return
+  }
+
+  if (
+    'speechSynthesis'
+      in window
+  ) {
+    window.speechSynthesis.cancel()
+  }
+
+  anunciar(
+    'Leitura por voz desativada.',
+  )
 }
 
 function criarIconeCarrinho() {
@@ -124,7 +327,9 @@ function criarCardProduto(
   compacto = false,
 ) {
   const artigo =
-    document.createElement('article')
+    document.createElement(
+      'article',
+    )
 
   artigo.className =
     compacto
@@ -163,13 +368,14 @@ function criarCardProduto(
 
       <div class="produto-rodape">
         <strong class="produto-preco">
-          ${moeda.format(produto.preco)}
+          ${moeda.format(
+            produto.preco,
+          )}
         </strong>
 
         <button
           class="adicionar-produto"
           type="button"
-          data-produto="${produto.id}"
           aria-label="Adicionar ${produto.nome} ao pedido"
         >
           ${criarIconeCarrinho()}
@@ -182,14 +388,18 @@ function criarCardProduto(
     </div>
   `
 
-  const botaoAdicionar =
-    artigo.querySelector('.adicionar-produto')
+  const botao =
+    artigo.querySelector(
+      '.adicionar-produto',
+    )
 
-  if (botaoAdicionar) {
-    botaoAdicionar.addEventListener(
+  if (botao) {
+    botao.addEventListener(
       'click',
       () => {
-        adicionarProduto(produto.id)
+        adicionarProduto(
+          produto.id,
+        )
       },
     )
   }
@@ -202,26 +412,30 @@ function renderizarDestaques() {
     return
   }
 
-  elementos.destaques.innerHTML = ''
+  elementos.destaques.innerHTML =
+    ''
 
-  produtosDestaque.forEach((id) => {
-    const produto =
-      produtos.find(
-        (item) =>
-          item.id === id,
-      )
+  produtosDestaque.forEach(
+    (id) => {
+      const produto =
+        produtos.find(
+          (item) =>
+            item.id === id,
+        )
 
-    if (!produto) {
-      return
-    }
+      if (!produto) {
+        return
+      }
 
-    elementos.destaques.appendChild(
-      criarCardProduto(
-        produto,
-        true,
-      ),
-    )
-  })
+      elementos.destaques
+        .appendChild(
+          criarCardProduto(
+            produto,
+            true,
+          ),
+        )
+    },
+  )
 }
 
 function renderizarFiltros() {
@@ -229,44 +443,65 @@ function renderizarFiltros() {
     return
   }
 
-  elementos.filtros.innerHTML = ''
+  elementos.filtros.innerHTML =
+    ''
 
-  categorias.forEach((categoria) => {
-    const botao =
-      document.createElement('button')
-
-    botao.type = 'button'
-    botao.className = 'filtro-botao'
-    botao.textContent = categoria
-
-    const ativo =
-      estado.categoria === categoria
-
-    botao.setAttribute(
-      'aria-pressed',
-      String(ativo),
-    )
-
-    if (ativo) {
-      botao.classList.add('ativo')
-    }
-
-    botao.addEventListener(
-      'click',
-      () => {
-        estado.categoria = categoria
-
-        renderizarFiltros()
-        renderizarMenu()
-
-        anunciar(
-          `Categoria ${categoria} selecionada.`,
+  categorias.forEach(
+    (categoria) => {
+      const botao =
+        document.createElement(
+          'button',
         )
-      },
-    )
 
-    elementos.filtros.appendChild(botao)
-  })
+      botao.type =
+        'button'
+
+      botao.className =
+        'filtro-botao'
+
+      botao.textContent =
+        categoria
+
+      const ativo =
+        estado.categoria ===
+        categoria
+
+      botao.setAttribute(
+        'aria-pressed',
+        String(ativo),
+      )
+
+      if (ativo) {
+        botao.classList.add(
+          'ativo',
+        )
+      }
+
+      botao.addEventListener(
+        'click',
+        () => {
+          estado.categoria =
+            categoria
+
+          renderizarFiltros()
+          renderizarMenu()
+
+          anunciar(
+            `Categoria ${categoria} selecionada.`,
+          )
+
+          falar(
+            `Categoria ${categoria} selecionada.`,
+          )
+        },
+      )
+
+      elementos.filtros
+        .appendChild(
+          botao,
+        )
+    },
+  )
 }
 
 function renderizarMenu() {
@@ -274,7 +509,8 @@ function renderizarMenu() {
     return
   }
 
-  elementos.menu.innerHTML = ''
+  elementos.menu.innerHTML =
+    ''
 
   const produtosVisiveis =
     estado.categoria === 'Todos'
@@ -285,14 +521,36 @@ function renderizarMenu() {
             estado.categoria,
         )
 
-  produtosVisiveis.forEach((produto) => {
-    elementos.menu.appendChild(
-      criarCardProduto(produto),
-    )
-  })
+  produtosVisiveis.forEach(
+    (produto) => {
+      elementos.menu
+        .appendChild(
+          criarCardProduto(
+            produto,
+          ),
+        )
+    },
+  )
 }
 
-function adicionarProduto(produtoId) {
+function obterQuantidadeProduto(
+  produtoId,
+) {
+  const item =
+    estado.carrinho.find(
+      (entrada) =>
+        entrada.produto.id ===
+        produtoId,
+    )
+
+  return item
+    ? item.quantidade
+    : 0
+}
+
+function adicionarProduto(
+  produtoId,
+) {
   const produto =
     produtos.find(
       (item) =>
@@ -312,8 +570,24 @@ function adicionarProduto(produtoId) {
 
   renderizarCarrinho()
 
+  const quantidade =
+    obterQuantidadeProduto(
+      produtoId,
+    )
+
+  const totais =
+    calcularTotais(
+      estado.carrinho,
+    )
+
   anunciar(
     `${produto.nome} adicionado ao pedido.`,
+  )
+
+  falar(
+    `${produto.nome} adicionado. Quantidade ${quantidade}. Total do pedido ${formatarValorParaVoz(
+      totais.total,
+    )}.`,
   )
 }
 
@@ -321,6 +595,16 @@ function atualizarQuantidade(
   produtoId,
   delta,
 ) {
+  const produto =
+    produtos.find(
+      (item) =>
+        item.id === produtoId,
+    )
+
+  if (!produto) {
+    return
+  }
+
   estado.carrinho =
     alterarQuantidade(
       estado.carrinho,
@@ -329,9 +613,45 @@ function atualizarQuantidade(
     )
 
   renderizarCarrinho()
+
+  const quantidade =
+    obterQuantidadeProduto(
+      produtoId,
+    )
+
+  const totais =
+    calcularTotais(
+      estado.carrinho,
+    )
+
+  if (quantidade === 0) {
+    anunciar(
+      `${produto.nome} removido do pedido.`,
+    )
+
+    falar(
+      `${produto.nome} removido. Total do pedido ${formatarValorParaVoz(
+        totais.total,
+      )}.`,
+    )
+
+    return
+  }
+
+  anunciar(
+    `Quantidade de ${produto.nome}: ${quantidade}.`,
+  )
+
+  falar(
+    `Quantidade de ${produto.nome} alterada para ${quantidade}. Total do pedido ${formatarValorParaVoz(
+      totais.total,
+    )}.`,
+  )
 }
 
-function removerProduto(produtoId) {
+function removerProduto(
+  produtoId,
+) {
   const item =
     estado.carrinho.find(
       (entrada) =>
@@ -347,11 +667,24 @@ function removerProduto(produtoId) {
 
   renderizarCarrinho()
 
-  if (item) {
-    anunciar(
-      `${item.produto.nome} removido do pedido.`,
-    )
+  if (!item) {
+    return
   }
+
+  const totais =
+    calcularTotais(
+      estado.carrinho,
+    )
+
+  anunciar(
+    `${item.produto.nome} removido do pedido.`,
+  )
+
+  falar(
+    `${item.produto.nome} removido. Total do pedido ${formatarValorParaVoz(
+      totais.total,
+    )}.`,
+  )
 }
 
 function limparCarrinho() {
@@ -365,14 +698,25 @@ function limparCarrinho() {
 
   renderizarCarrinho()
 
-  anunciar('Carrinho limpo.')
+  anunciar(
+    'Carrinho limpo.',
+  )
+
+  falar(
+    'Carrinho limpo. O pedido está vazio.',
+  )
 }
 
-function criarItemCarrinho(item) {
+function criarItemCarrinho(
+  item,
+) {
   const linha =
-    document.createElement('article')
+    document.createElement(
+      'article',
+    )
 
-  linha.className = 'carrinho-item'
+  linha.className =
+    'carrinho-item'
 
   linha.innerHTML = `
     <img
@@ -426,23 +770,29 @@ function criarItemCarrinho(item) {
   `
 
   linha
-    .querySelectorAll('[data-delta]')
-    .forEach((botao) => {
-      botao.addEventListener(
-        'click',
-        () => {
-          atualizarQuantidade(
-            item.produto.id,
-            Number(
-              botao.dataset.delta,
-            ),
-          )
-        },
-      )
-    })
+    .querySelectorAll(
+      '[data-delta]',
+    )
+    .forEach(
+      (botao) => {
+        botao.addEventListener(
+          'click',
+          () => {
+            atualizarQuantidade(
+              item.produto.id,
+              Number(
+                botao.dataset.delta,
+              ),
+            )
+          },
+        )
+      },
+    )
 
   const botaoRemover =
-    linha.querySelector('.remover-item')
+    linha.querySelector(
+      '.remover-item',
+    )
 
   if (botaoRemover) {
     botaoRemover.addEventListener(
@@ -468,12 +818,14 @@ function renderizarCarrinho() {
       estado.carrinho,
     )
 
-  const carrinhoVazio =
-    totais.quantidadeItens === 0
+  const vazio =
+    totais.quantidadeItens ===
+    0
 
-  elementos.resumo.innerHTML = ''
+  elementos.resumo.innerHTML =
+    ''
 
-  if (carrinhoVazio) {
+  if (vazio) {
     elementos.resumo.innerHTML = `
       <div class="carrinho-vazio">
         <span
@@ -488,20 +840,24 @@ function renderizarCarrinho() {
         </strong>
 
         <p>
-          Adicione um item do cardápio
-          e ele aparecerá aqui.
+          Adicione um item do cardápio e ele aparecerá aqui.
         </p>
       </div>
     `
   } else {
-    estado.carrinho.forEach((item) => {
-      elementos.resumo.appendChild(
-        criarItemCarrinho(item),
-      )
-    })
+    estado.carrinho.forEach(
+      (item) => {
+        elementos.resumo
+          .appendChild(
+            criarItemCarrinho(
+              item,
+            ),
+          )
+      },
+    )
   }
 
-  const legendaItens =
+  const legenda =
     `${totais.quantidadeItens} ${
       totais.quantidadeItens === 1
         ? 'item'
@@ -512,7 +868,7 @@ function renderizarCarrinho() {
     elementos.quantidadeCarrinho
   ) {
     elementos.quantidadeCarrinho.textContent =
-      legendaItens
+      legenda
   }
 
   if (elementos.contadorTopo) {
@@ -536,17 +892,17 @@ function renderizarCarrinho() {
 
   if (elementos.finalizar) {
     elementos.finalizar.disabled =
-      carrinhoVazio
+      vazio
   }
 
   if (elementos.limpar) {
     elementos.limpar.disabled =
-      carrinhoVazio
+      vazio
   }
 
   if (elementos.mobileItens) {
     elementos.mobileItens.textContent =
-      legendaItens
+      legenda
   }
 
   if (elementos.mobileTotal) {
@@ -558,7 +914,7 @@ function renderizarCarrinho() {
 
   if (elementos.barraMobile) {
     elementos.barraMobile.hidden =
-      carrinhoVazio
+      vazio
   }
 }
 
@@ -570,9 +926,10 @@ function gerarNumeroPedido() {
     const valores =
       new Uint16Array(1)
 
-    window.crypto.getRandomValues(
-      valores,
-    )
+    window.crypto
+      .getRandomValues(
+        valores,
+      )
 
     return `AUR ${String(
       1000 +
@@ -593,14 +950,20 @@ function finalizarPedido() {
     )
 
   if (
-    totais.quantidadeItens === 0
+    totais.quantidadeItens ===
+    0
   ) {
     return
   }
 
-  if (elementos.numeroPedido) {
+  const numeroPedido =
+    gerarNumeroPedido()
+
+  if (
+    elementos.numeroPedido
+  ) {
     elementos.numeroPedido.textContent =
-      gerarNumeroPedido()
+      numeroPedido
   }
 
   if (
@@ -619,21 +982,32 @@ function finalizarPedido() {
       )
   }
 
-  estado.carrinho = []
-
-  renderizarCarrinho()
-
   if (
     elementos.confirmacao &&
     typeof elementos.confirmacao.showModal ===
       'function'
   ) {
-    elementos.confirmacao.showModal()
+    elementos.confirmacao
+      .showModal()
   }
 
   anunciar(
     'Pedido registrado com sucesso.',
   )
+
+  falar(
+    `Pedido registrado com sucesso. Número ${numeroPedido}. ${totais.quantidadeItens} ${
+      totais.quantidadeItens === 1
+        ? 'item'
+        : 'itens'
+    }. Total ${formatarValorParaVoz(
+      totais.total,
+    )}.`,
+  )
+
+  estado.carrinho = []
+
+  renderizarCarrinho()
 }
 
 function rolarParaCarrinho() {
@@ -652,84 +1026,6 @@ function rolarParaCarrinho() {
   })
 }
 
-function falar(texto) {
-  if (
-    !(
-      'speechSynthesis'
-      in window
-    )
-  ) {
-    anunciar(
-      'A leitura por voz não está disponível neste navegador.',
-    )
-
-    return
-  }
-
-  window.speechSynthesis.cancel()
-
-  const mensagem =
-    new SpeechSynthesisUtterance(
-      texto,
-    )
-
-  mensagem.lang = 'pt-BR'
-  mensagem.rate = 0.95
-  mensagem.pitch = 1
-
-  const vozes =
-    window.speechSynthesis
-      .getVoices()
-
-  const vozPortugues =
-    vozes.find(
-      (voz) =>
-        voz.lang
-          .toLowerCase()
-          .startsWith('pt-br'),
-    )
-
-  if (vozPortugues) {
-    mensagem.voice =
-      vozPortugues
-  }
-
-  window.speechSynthesis.speak(
-    mensagem,
-  )
-}
-
-function ouvirCardapio() {
-  if (
-    'speechSynthesis'
-      in window &&
-    window.speechSynthesis
-      .speaking
-  ) {
-    window.speechSynthesis.cancel()
-
-    anunciar(
-      'Leitura interrompida.',
-    )
-
-    return
-  }
-
-  const texto =
-    produtos
-      .map(
-        (produto) =>
-          `${produto.nome}, ${moeda.format(
-            produto.preco,
-          )}.`,
-      )
-      .join(' ')
-
-  falar(
-    `Cardápio da Padaria Aurora. ${texto}`,
-  )
-}
-
 function alternarFonte() {
   estado.fonteAmpliada =
     !estado.fonteAmpliada
@@ -740,7 +1036,9 @@ function alternarFonte() {
       estado.fonteAmpliada,
     )
 
-  if (elementos.alternarFonte) {
+  if (
+    elementos.alternarFonte
+  ) {
     elementos.alternarFonte
       .classList.toggle(
         'ativo',
@@ -761,16 +1059,23 @@ function alternarFonte() {
       ? 'Texto maior ativado.'
       : 'Texto maior desativado.',
   )
+
+  falar(
+    estado.fonteAmpliada
+      ? 'Texto maior ativado.'
+      : 'Texto maior desativado.',
+  )
 }
 
 function alternarContraste() {
   estado.altoContraste =
     !estado.altoContraste
 
-  document.body.classList.toggle(
-    'alto-contraste',
-    estado.altoContraste,
-  )
+  document.body
+    .classList.toggle(
+      'alto-contraste',
+      estado.altoContraste,
+    )
 
   if (
     elementos.alternarContraste
@@ -795,23 +1100,33 @@ function alternarContraste() {
       ? 'Alto contraste ativado.'
       : 'Alto contraste desativado.',
   )
+
+  falar(
+    estado.altoContraste
+      ? 'Alto contraste ativado.'
+      : 'Alto contraste desativado.',
+  )
 }
 
 if (elementos.finalizar) {
-  elementos.finalizar.addEventListener(
-    'click',
-    finalizarPedido,
-  )
+  elementos.finalizar
+    .addEventListener(
+      'click',
+      finalizarPedido,
+    )
 }
 
 if (elementos.limpar) {
-  elementos.limpar.addEventListener(
-    'click',
-    limparCarrinho,
-  )
+  elementos.limpar
+    .addEventListener(
+      'click',
+      limparCarrinho,
+    )
 }
 
-if (elementos.abrirCarrinho) {
+if (
+  elementos.abrirCarrinho
+) {
   elementos.abrirCarrinho
     .addEventListener(
       'click',
@@ -819,7 +1134,9 @@ if (elementos.abrirCarrinho) {
     )
 }
 
-if (elementos.barraMobile) {
+if (
+  elementos.barraMobile
+) {
   elementos.barraMobile
     .addEventListener(
       'click',
@@ -827,7 +1144,9 @@ if (elementos.barraMobile) {
     )
 }
 
-if (elementos.alternarFonte) {
+if (
+  elementos.alternarFonte
+) {
   elementos.alternarFonte
     .addEventListener(
       'click',
@@ -845,44 +1164,51 @@ if (
     )
 }
 
-if (elementos.novoPedido) {
-  elementos.novoPedido.addEventListener(
-    'click',
-    () => {
-      if (
-        elementos.confirmacao &&
-        typeof elementos.confirmacao.close ===
-          'function'
-      ) {
-        elementos.confirmacao.close()
-      }
+if (
+  elementos.novoPedido
+) {
+  elementos.novoPedido
+    .addEventListener(
+      'click',
+      () => {
+        if (
+          elementos.confirmacao &&
+          typeof elementos.confirmacao.close ===
+            'function'
+        ) {
+          elementos.confirmacao
+            .close()
+        }
 
-      const cardapio =
-        document.getElementById(
-          'cardapio',
-        )
+        const cardapio =
+          document.getElementById(
+            'cardapio',
+          )
 
-      if (cardapio) {
-        cardapio.scrollIntoView({
-          behavior: 'smooth',
-        })
-      }
-    },
-  )
+        if (cardapio) {
+          cardapio.scrollIntoView({
+            behavior: 'smooth',
+          })
+        }
+      },
+    )
 }
 
 document
   .querySelectorAll(
-    '[data-acao="ouvir-cardapio"]',
+    '[data-acao="alternar-voz"]',
   )
-  .forEach((botao) => {
-    botao.addEventListener(
-      'click',
-      ouvirCardapio,
-    )
-  })
+  .forEach(
+    (botao) => {
+      botao.addEventListener(
+        'click',
+        alternarVoz,
+      )
+    },
+  )
 
 renderizarDestaques()
 renderizarFiltros()
 renderizarMenu()
 renderizarCarrinho()
+atualizarBotoesVoz()
