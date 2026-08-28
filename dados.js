@@ -15,7 +15,7 @@ export const produtos = [
     descricao:
       'Casquinha crocante, miolo leve e fornada fresca ao longo do dia.',
     destaque: 'Fresco hoje',
-    imagem: 'img/pao-frances.svg',
+    imagem: 'img/paofrances.jpg',
   },
   {
     id: 'bolo-cenoura',
@@ -25,7 +25,7 @@ export const produtos = [
     descricao:
       'Massa macia de cenoura com cobertura cremosa de chocolate.',
     destaque: 'Clássico da casa',
-    imagem: 'img/bolo-cenoura.svg',
+    imagem: 'img/bolodecenoura.jpg',
   },
   {
     id: 'croissant',
@@ -35,7 +35,7 @@ export const produtos = [
     descricao:
       'Massa folhada amanteigada, leve e assada até ficar dourada.',
     destaque: 'Mais pedido',
-    imagem: 'img/croissant.svg',
+    imagem: 'img/croissant.jpg',
   },
   {
     id: 'sonho-creme',
@@ -45,7 +45,7 @@ export const produtos = [
     descricao:
       'Massa delicada, recheio cremoso e finalização com açúcar.',
     destaque: 'Doce favorito',
-    imagem: 'img/sonho.svg',
+    imagem: 'img/sonho.jpg',
   },
   {
     id: 'pao-queijo',
@@ -55,7 +55,7 @@ export const produtos = [
     descricao:
       'Dourado por fora, macio por dentro e com sabor marcante de queijo.',
     destaque: 'Sai quentinho',
-    imagem: 'img/pao-queijo.svg',
+    imagem: 'img/pao-queijo.jpg',
   },
   {
     id: 'torta-frango',
@@ -65,7 +65,7 @@ export const produtos = [
     descricao:
       'Massa leve com recheio cremoso de frango e temperos suaves.',
     destaque: 'Boa para o almoço',
-    imagem: 'img/torta-frango.svg',
+    imagem: 'img/torta-frango.jpg',
   },
   {
     id: 'cafe-leite',
@@ -75,7 +75,7 @@ export const produtos = [
     descricao:
       'Café passado na hora com leite quente e textura aveludada.',
     destaque: 'Combina com tudo',
-    imagem: 'img/cafe-leite.svg',
+    imagem: 'img/cafe-leite.jpg',
   },
 ]
 
