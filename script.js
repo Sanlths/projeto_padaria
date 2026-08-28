@@ -11,13 +11,10 @@ import {
   calcularTotais,
 } from './carrinho.js'
 
-const moeda = new Intl.NumberFormat(
-  'pt-BR',
-  {
-    style: 'currency',
-    currency: 'BRL',
-  },
-)
+const moeda = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+})
 
 const estado = {
   categoria: 'Todos',
@@ -28,96 +25,59 @@ const estado = {
 
 const elementos = {
   menu: document.getElementById('menu'),
-
   filtros: document.getElementById('filtros'),
-
   destaques: document.getElementById('destaques'),
-
   resumo: document.getElementById('resumo'),
-
   subtotal: document.getElementById('subtotal'),
-
   total: document.getElementById('total'),
 
   quantidadeCarrinho:
-    document.getElementById(
-      'quantidade-carrinho',
-    ),
+    document.getElementById('quantidade-carrinho'),
 
   contadorTopo:
-    document.getElementById(
-      'contador-topo',
-    ),
+    document.getElementById('contador-topo'),
 
   finalizar:
-    document.getElementById(
-      'finalizar',
-    ),
+    document.getElementById('finalizar'),
 
   limpar:
-    document.getElementById(
-      'limpar',
-    ),
+    document.getElementById('limpar'),
 
   abrirCarrinho:
-    document.getElementById(
-      'abrir-carrinho',
-    ),
+    document.getElementById('abrir-carrinho'),
 
   barraMobile:
-    document.getElementById(
-      'barra-carrinho-mobile',
-    ),
+    document.getElementById('barra-carrinho-mobile'),
 
   mobileItens:
-    document.getElementById(
-      'mobile-itens',
-    ),
+    document.getElementById('mobile-itens'),
 
   mobileTotal:
-    document.getElementById(
-      'mobile-total',
-    ),
+    document.getElementById('mobile-total'),
 
   alternarFonte:
-    document.getElementById(
-      'alternar-fonte',
-    ),
+    document.getElementById('alternar-fonte'),
 
   alternarContraste:
-    document.getElementById(
-      'alternar-contraste',
-    ),
+    document.getElementById('alternar-contraste'),
 
   anuncios:
-    document.getElementById(
-      'anuncios',
-    ),
+    document.getElementById('anuncios'),
 
   confirmacao:
-    document.getElementById(
-      'confirmacao-pedido',
-    ),
+    document.getElementById('confirmacao-pedido'),
 
   numeroPedido:
-    document.getElementById(
-      'numero-pedido',
-    ),
+    document.getElementById('numero-pedido'),
 
   confirmacaoItens:
-    document.getElementById(
-      'confirmacao-itens',
-    ),
+    document.getElementById('confirmacao-itens'),
 
   confirmacaoTotal:
-    document.getElementById(
-      'confirmacao-total',
-    ),
+    document.getElementById('confirmacao-total'),
 
   novoPedido:
-    document.getElementById(
-      'novo-pedido',
-    ),
+    document.getElementById('novo-pedido'),
 }
 
 function anunciar(mensagem) {
@@ -127,13 +87,9 @@ function anunciar(mensagem) {
 
   elementos.anuncios.textContent = ''
 
-  window.setTimeout(
-    () => {
-      elementos.anuncios.textContent =
-        mensagem
-    },
-    40,
-  )
+  window.setTimeout(() => {
+    elementos.anuncios.textContent = mensagem
+  }, 40)
 }
 
 function criarIconeCarrinho() {
@@ -168,9 +124,7 @@ function criarCardProduto(
   compacto = false,
 ) {
   const artigo =
-    document.createElement(
-      'article',
-    )
+    document.createElement('article')
 
   artigo.className =
     compacto
@@ -209,9 +163,7 @@ function criarCardProduto(
 
       <div class="produto-rodape">
         <strong class="produto-preco">
-          ${moeda.format(
-            produto.preco,
-          )}
+          ${moeda.format(produto.preco)}
         </strong>
 
         <button
@@ -231,18 +183,16 @@ function criarCardProduto(
   `
 
   const botaoAdicionar =
-    artigo.querySelector(
-      '.adicionar-produto',
-    )
+    artigo.querySelector('.adicionar-produto')
 
-  botaoAdicionar.addEventListener(
-    'click',
-    () => {
-      adicionarProduto(
-        produto.id,
-      )
-    },
-  )
+  if (botaoAdicionar) {
+    botaoAdicionar.addEventListener(
+      'click',
+      () => {
+        adicionarProduto(produto.id)
+      },
+    )
+  }
 
   return artigo
 }
@@ -254,27 +204,24 @@ function renderizarDestaques() {
 
   elementos.destaques.innerHTML = ''
 
-  produtosDestaque.forEach(
-    (id) => {
-      const produto =
-        produtos.find(
-          (item) =>
-            item.id === id,
-        )
+  produtosDestaque.forEach((id) => {
+    const produto =
+      produtos.find(
+        (item) =>
+          item.id === id,
+      )
 
-      if (!produto) {
-        return
-      }
+    if (!produto) {
+      return
+    }
 
-      elementos.destaques
-        .appendChild(
-          criarCardProduto(
-            produto,
-            true,
-          ),
-        )
-    },
-  )
+    elementos.destaques.appendChild(
+      criarCardProduto(
+        produto,
+        true,
+      ),
+    )
+  })
 }
 
 function renderizarFiltros() {
@@ -284,57 +231,42 @@ function renderizarFiltros() {
 
   elementos.filtros.innerHTML = ''
 
-  categorias.forEach(
-    (categoria) => {
-      const botao =
-        document.createElement(
-          'button',
+  categorias.forEach((categoria) => {
+    const botao =
+      document.createElement('button')
+
+    botao.type = 'button'
+    botao.className = 'filtro-botao'
+    botao.textContent = categoria
+
+    const ativo =
+      estado.categoria === categoria
+
+    botao.setAttribute(
+      'aria-pressed',
+      String(ativo),
+    )
+
+    if (ativo) {
+      botao.classList.add('ativo')
+    }
+
+    botao.addEventListener(
+      'click',
+      () => {
+        estado.categoria = categoria
+
+        renderizarFiltros()
+        renderizarMenu()
+
+        anunciar(
+          `Categoria ${categoria} selecionada.`,
         )
+      },
+    )
 
-      botao.type = 'button'
-
-      botao.className =
-        'filtro-botao'
-
-      botao.textContent =
-        categoria
-
-      const ativo =
-        estado.categoria ===
-        categoria
-
-      botao.setAttribute(
-        'aria-pressed',
-        String(ativo),
-      )
-
-      if (ativo) {
-        botao.classList.add(
-          'ativo',
-        )
-      }
-
-      botao.addEventListener(
-        'click',
-        () => {
-          estado.categoria =
-            categoria
-
-          renderizarFiltros()
-          renderizarMenu()
-
-          anunciar(
-            `Categoria ${categoria} selecionada.`,
-          )
-        },
-      )
-
-      elementos.filtros
-        .appendChild(
-          botao,
-        )
-    },
-  )
+    elementos.filtros.appendChild(botao)
+  })
 }
 
 function renderizarMenu() {
@@ -353,18 +285,14 @@ function renderizarMenu() {
             estado.categoria,
         )
 
-  produtosVisiveis.forEach(
-    (produto) => {
-      elementos.menu.appendChild(
-        criarCardProduto(produto),
-      )
-    },
-  )
+  produtosVisiveis.forEach((produto) => {
+    elementos.menu.appendChild(
+      criarCardProduto(produto),
+    )
+  })
 }
 
-function adicionarProduto(
-  produtoId,
-) {
+function adicionarProduto(produtoId) {
   const produto =
     produtos.find(
       (item) =>
@@ -403,9 +331,7 @@ function atualizarQuantidade(
   renderizarCarrinho()
 }
 
-function removerProduto(
-  produtoId,
-) {
+function removerProduto(produtoId) {
   const item =
     estado.carrinho.find(
       (entrada) =>
@@ -439,21 +365,14 @@ function limparCarrinho() {
 
   renderizarCarrinho()
 
-  anunciar(
-    'Carrinho limpo.',
-  )
+  anunciar('Carrinho limpo.')
 }
 
-function criarItemCarrinho(
-  item,
-) {
+function criarItemCarrinho(item) {
   const linha =
-    document.createElement(
-      'article',
-    )
+    document.createElement('article')
 
-  linha.className =
-    'carrinho-item'
+  linha.className = 'carrinho-item'
 
   linha.innerHTML = `
     <img
@@ -507,30 +426,26 @@ function criarItemCarrinho(
   `
 
   linha
-    .querySelectorAll(
-      '[data-delta]',
-    )
-    .forEach(
-      (botao) => {
-        botao.addEventListener(
-          'click',
-          () => {
-            atualizarQuantidade(
-              item.produto.id,
-              Number(
-                botao.dataset.delta,
-              ),
-            )
-          },
-        )
-      },
-    )
+    .querySelectorAll('[data-delta]')
+    .forEach((botao) => {
+      botao.addEventListener(
+        'click',
+        () => {
+          atualizarQuantidade(
+            item.produto.id,
+            Number(
+              botao.dataset.delta,
+            ),
+          )
+        },
+      )
+    })
 
-  linha
-    .querySelector(
-      '.remover-item',
-    )
-    .addEventListener(
+  const botaoRemover =
+    linha.querySelector('.remover-item')
+
+  if (botaoRemover) {
+    botaoRemover.addEventListener(
       'click',
       () => {
         removerProduto(
@@ -538,19 +453,15 @@ function criarItemCarrinho(
         )
       },
     )
+  }
 
   return linha
 }
 
 function renderizarCarrinho() {
-  if (
-    !elementos.resumo ||
-    !elementos.total
-  ) {
+  if (!elementos.resumo) {
     return
   }
-
-  elementos.resumo.innerHTML = ''
 
   const totais =
     calcularTotais(
@@ -559,6 +470,8 @@ function renderizarCarrinho() {
 
   const carrinhoVazio =
     totais.quantidadeItens === 0
+
+  elementos.resumo.innerHTML = ''
 
   if (carrinhoVazio) {
     elementos.resumo.innerHTML = `
@@ -575,21 +488,17 @@ function renderizarCarrinho() {
         </strong>
 
         <p>
-          Adicione um item do cardápio e ele aparecerá aqui.
+          Adicione um item do cardápio
+          e ele aparecerá aqui.
         </p>
       </div>
     `
   } else {
-    estado.carrinho.forEach(
-      (item) => {
-        elementos.resumo
-          .appendChild(
-            criarItemCarrinho(
-              item,
-            ),
-          )
-      },
-    )
+    estado.carrinho.forEach((item) => {
+      elementos.resumo.appendChild(
+        criarItemCarrinho(item),
+      )
+    })
   }
 
   const legendaItens =
@@ -618,10 +527,12 @@ function renderizarCarrinho() {
       )
   }
 
-  elementos.total.textContent =
-    moeda.format(
-      totais.total,
-    )
+  if (elementos.total) {
+    elementos.total.textContent =
+      moeda.format(
+        totais.total,
+      )
+  }
 
   if (elementos.finalizar) {
     elementos.finalizar.disabled =
@@ -659,10 +570,9 @@ function gerarNumeroPedido() {
     const valores =
       new Uint16Array(1)
 
-    window.crypto
-      .getRandomValues(
-        valores,
-      )
+    window.crypto.getRandomValues(
+      valores,
+    )
 
     return `AUR ${String(
       1000 +
@@ -688,9 +598,7 @@ function finalizarPedido() {
     return
   }
 
-  if (
-    elementos.numeroPedido
-  ) {
+  if (elementos.numeroPedido) {
     elementos.numeroPedido.textContent =
       gerarNumeroPedido()
   }
@@ -778,9 +686,7 @@ function falar(texto) {
       (voz) =>
         voz.lang
           .toLowerCase()
-          .startsWith(
-            'pt-br',
-          ),
+          .startsWith('pt-br'),
     )
 
   if (vozPortugues) {
@@ -788,10 +694,9 @@ function falar(texto) {
       vozPortugues
   }
 
-  window.speechSynthesis
-    .speak(
-      mensagem,
-    )
+  window.speechSynthesis.speak(
+    mensagem,
+  )
 }
 
 function ouvirCardapio() {
@@ -835,9 +740,7 @@ function alternarFonte() {
       estado.fonteAmpliada,
     )
 
-  if (
-    elementos.alternarFonte
-  ) {
+  if (elementos.alternarFonte) {
     elementos.alternarFonte
       .classList.toggle(
         'ativo',
@@ -864,11 +767,10 @@ function alternarContraste() {
   estado.altoContraste =
     !estado.altoContraste
 
-  document.body
-    .classList.toggle(
-      'alto-contraste',
-      estado.altoContraste,
-    )
+  document.body.classList.toggle(
+    'alto-contraste',
+    estado.altoContraste,
+  )
 
   if (
     elementos.alternarContraste
@@ -896,19 +798,17 @@ function alternarContraste() {
 }
 
 if (elementos.finalizar) {
-  elementos.finalizar
-    .addEventListener(
-      'click',
-      finalizarPedido,
-    )
+  elementos.finalizar.addEventListener(
+    'click',
+    finalizarPedido,
+  )
 }
 
 if (elementos.limpar) {
-  elementos.limpar
-    .addEventListener(
-      'click',
-      limparCarrinho,
-    )
+  elementos.limpar.addEventListener(
+    'click',
+    limparCarrinho,
+  )
 }
 
 if (elementos.abrirCarrinho) {
@@ -946,44 +846,41 @@ if (
 }
 
 if (elementos.novoPedido) {
-  elementos.novoPedido
-    .addEventListener(
-      'click',
-      () => {
-        if (
-          elementos.confirmacao &&
-          typeof elementos.confirmacao.close ===
-            'function'
-        ) {
-          elementos.confirmacao.close()
-        }
+  elementos.novoPedido.addEventListener(
+    'click',
+    () => {
+      if (
+        elementos.confirmacao &&
+        typeof elementos.confirmacao.close ===
+          'function'
+      ) {
+        elementos.confirmacao.close()
+      }
 
-        const cardapio =
-          document.getElementById(
-            'cardapio',
-          )
+      const cardapio =
+        document.getElementById(
+          'cardapio',
+        )
 
-        if (cardapio) {
-          cardapio.scrollIntoView({
-            behavior: 'smooth',
-          })
-        }
-      },
-    )
+      if (cardapio) {
+        cardapio.scrollIntoView({
+          behavior: 'smooth',
+        })
+      }
+    },
+  )
 }
 
 document
   .querySelectorAll(
     '[data-acao="ouvir-cardapio"]',
   )
-  .forEach(
-    (botao) => {
-      botao.addEventListener(
-        'click',
-        ouvirCardapio,
-      )
-    },
-  )
+  .forEach((botao) => {
+    botao.addEventListener(
+      'click',
+      ouvirCardapio,
+    )
+  })
 
 renderizarDestaques()
 renderizarFiltros()
