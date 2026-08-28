@@ -2,7 +2,11 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
 
     <meta
       name="description"
@@ -17,12 +21,6 @@
     <title>
       Padaria Aurora | Pedidos online
     </title>
-
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="img/logo-aurora.svg"
-    />
 
     <link
       rel="stylesheet"
@@ -45,14 +43,14 @@
           href="#inicio"
           aria-label="Padaria Aurora, início"
         >
-          <img
-            src="img/logo-aurora.svg"
-            alt=""
-            width="46"
-            height="46"
-          />
+          <span
+            class="marca-simbolo"
+            aria-hidden="true"
+          >
+            PA
+          </span>
 
-          <span>
+          <span class="marca-texto">
             <strong>
               Padaria Aurora
             </strong>
@@ -132,15 +130,18 @@
               </a>
 
               <button
-                class="botao botao-secundario botao-ouvir"
+                class="botao botao-secundario botao-voz"
                 type="button"
-                data-acao="ouvir-cardapio"
+                data-acao="alternar-voz"
+                aria-pressed="false"
               >
                 <span aria-hidden="true">
                   🔊
                 </span>
 
-                Ouvir opções
+                <span class="texto-voz">
+                  Ativar leitura por voz
+                </span>
               </button>
             </div>
 
@@ -180,48 +181,60 @@
             </div>
           </div>
 
-          <div
-            class="hero-visual"
-            aria-hidden="true"
-          >
-            <div
-              class="hero-card hero-card-principal"
-            >
-              <img
-                src="img/croissant.jpg"
-                alt=""
-              />
+          <div class="hero-visual">
+            <article class="hero-produto-principal">
+              <div class="hero-imagem">
+                <img
+                  src="img/croissant.jpg"
+                  alt="Croissant dourado servido em um prato"
+                />
 
-              <div>
-                <span>
+                <span class="hero-etiqueta">
                   Mais pedido hoje
+                </span>
+              </div>
+
+              <div class="hero-produto-conteudo">
+                <span>
+                  Pães
                 </span>
 
                 <strong>
                   Croissant
                 </strong>
 
-                <small>
-                  Folhado, amanteigado e dourado
-                </small>
+                <p>
+                  Massa folhada, amanteigada e assada até ficar dourada.
+                </p>
               </div>
-            </div>
+            </article>
 
-            <div
-              class="hero-card hero-card-cafe"
-            >
+            <article class="hero-produto-secundario">
               <img
                 src="img/cafe-leite.jpg"
-                alt=""
+                alt="Café com leite servido em uma xícara"
               />
 
-              <span>
-                Café passado na hora
-              </span>
-            </div>
+              <div>
+                <span>
+                  Bebidas
+                </span>
 
-            <div class="hero-selo">
-              <span>
+                <strong>
+                  Café passado na hora
+                </strong>
+
+                <small>
+                  Perfeito para acompanhar sua escolha.
+                </small>
+              </div>
+            </article>
+
+            <div class="hero-fornada">
+              <span
+                class="hero-fornada-icone"
+                aria-hidden="true"
+              >
                 ☀
               </span>
 
@@ -400,9 +413,9 @@
             </h2>
 
             <p>
-              Ajuste a leitura da interface sem sair do fluxo do pedido.
-              Os controles abaixo funcionam diretamente no navegador
-              e podem ser ativados a qualquer momento.
+              Ajuste a leitura da interface e ative o acompanhamento por
+              voz. Quando a leitura estiver ligada, o sistema informará
+              alterações no pedido automaticamente.
             </p>
           </div>
 
@@ -456,9 +469,10 @@
             </button>
 
             <button
-              class="recurso-card botao-ouvir"
+              class="recurso-card botao-voz"
               type="button"
-              data-acao="ouvir-cardapio"
+              data-acao="alternar-voz"
+              aria-pressed="false"
             >
               <span
                 class="recurso-icone"
@@ -468,12 +482,12 @@
               </span>
 
               <span>
-                <strong>
-                  Ouvir cardápio
+                <strong class="texto-voz">
+                  Ativar leitura por voz
                 </strong>
 
                 <small>
-                  Lê nomes e preços dos produtos em voz alta.
+                  Informa produtos, quantidades e total durante o pedido.
                 </small>
               </span>
             </button>
@@ -485,12 +499,12 @@
     <footer class="rodape">
       <div class="rodape-conteudo">
         <div class="rodape-marca">
-          <img
-            src="img/logo-aurora.svg"
-            alt=""
-            width="42"
-            height="42"
-          />
+          <span
+            class="marca-simbolo marca-simbolo-rodape"
+            aria-hidden="true"
+          >
+            PA
+          </span>
 
           <div>
             <strong>
