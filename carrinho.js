@@ -11,10 +11,11 @@ export function adicionarAoCarrinho(
         )
       : 1
 
-  const existente = carrinho.find(
-    (item) =>
-      item.produto.id === produto.id,
-  )
+  const existente =
+    carrinho.find(
+      (item) =>
+        item.produto.id === produto.id,
+    )
 
   if (!existente) {
     return [
